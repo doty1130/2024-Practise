@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="./js/Program.js" defer></script>
+        <link rel="stylesheet" href="./style/ProgramStyle.css">
+        <title>Angular BCT Tracker</title>
+    </head>
+    <body>
+        <div id = "Title">
+            <h2>BCT Tracker</h2>
+        </br>
+            <p id = "serverCheck"></p></div>
+        <div id="TrackingField" ng-app="myCoinApp">
+            <div id="walletObject"></div>
+            <coin-Information></coin-Information>
+            <market-Chart data="marketData"></market-Chart>
+        </div>
+      
+      <!-- For website version Only-->
+         <div id = "WalletInformation" style = "margin: 10px;">
+            <button id="OpenForm" onclick="showInputForm()"><img src = "./assets/settings.png" width="15" height="15" ></button>
+            <form id="WalletForm" style = "display:none;">
+                <label> Wallet Name </label>
+                <input id = "walletName" type="text"/>
+                <label> Wallet Address </label>
+                <input id = "walletAddress" type="text"/>
+                <button onclick="loadWallet(event, 'optionalWalletName', 'optionalWalletAddress')">Add Wallet</button>
+            </form>
+        </div>
+    </body>
+</html>
+
+

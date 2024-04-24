@@ -1,0 +1,18 @@
+{
+  "Wallet Name":{
+    "type":"textbox",
+    "value":"",
+    "text": "Wallet name"
+  },
+  "Wallet Address":{
+    "type":"textbox",
+    "value":"",
+    "text": "Wallet Address"
+  },
+  "Submit":{
+    "type":"button",
+    "value":" Submit",
+    "text":"submit"
+  }
+
+}
