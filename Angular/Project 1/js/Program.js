@@ -2,6 +2,8 @@
 
 var WalletAddress = [];
 var WalletName = [];
+var walletName;
+var walletAddress;
 
 document.addEventListener("DOMContentLoaded", function() {    
     var xhr = new XMLHttpRequest();
@@ -46,7 +48,7 @@ function displayWalletBalance(data, walletName)
 {
     var walletInfo = data;
     var walletObject = document.getElementById("walletObject");
-    walletObject.innerHTML += "<p> Current Balance in "+ walletName +" : " + walletInfo.balance +"</P>";
+    walletObject.innerHTML += '<p> Current Balance in '+ walletName +' : <p id = "balance">'+ walletInfo.balance +'</p> </p>';
 }
 
 function showInputForm()
@@ -75,7 +77,7 @@ coinApp.directive("marketChart", ["$http", "$q", function($http, $q) {
             data: '<'
         },
         template: '<div id="chart_div"></div>',
-        link: function(scope, element, attrs) {
+        link: function(scope,element) {
             // Function to load Google Charts library synchronously
             function loadGoogleCharts() {
                 var deferred = $q.defer();
@@ -109,8 +111,7 @@ coinApp.directive("marketChart", ["$http", "$q", function($http, $q) {
                 .then(function(data) {
                     // Data is now available, render chart
                     renderChart(data);
-                    console.log("From api call");
-                    console.log(data);
+                  
                 })
                 .catch(function(error) {
                     console.log("Error loading data or chart", error);
@@ -137,11 +138,68 @@ coinApp.directive("marketChart", ["$http", "$q", function($http, $q) {
     };
 }]);
 
+coinApp.directive("mempoolStats", ["$http", "$q","$compile", function($http, $q, $compile){
+    return {
+        restrict: 'E',
+        scope: {
+            data: '<'
+        },
+        template: '<div id="mempoolStats"></div>',
+        link: function(scope, element) {
+        
+            var htmlTemplate = '<p>Mempool Stats: sat/vB {{mempoolData.total_fee/mempoolData.vsize}}</p>' +
+            '<p>Transactions: {{ mempoolData.count }}</p>' +
+            '<p>Size: {{ mempoolData.vsize }} bytes</p>' +
+            '<p>Fee Rate: Fastest {{ feeRecommendation.fastestFee }}, Half Hour Fee {{ feeRecommendation.halfHourFee}}, Hour Fee {{feeRecommendation.hourFee}}, Economy Fee {{ feeRecommendation.economyFee}}, Minimum Fee {{feeRecommendation.minimumFee}} </p>';
+       
+            function getMempool(){
+                var deferred = $q.defer();
+                var url = "https://mempool.space/api/mempool";
+                    $http.get(url)
+                    .then(function(response) {
+                        // Successful response
+                        deferred.resolve(response.data);
+                    })
+                    .catch(function(error) {
+                        deferred.reject(error);
+                    });
 
+                    return deferred.promise;
+            }
+            
+            function getFeeRecommendation(){
+                var deferred = $q.defer();
+                var url = "https://mempool.space/api/v1/fees/recommended";
+                $http.get(url) 
+                .then(function(response) {
+                    // Successful response
+                    deferred.resolve(response.data);
+                })
+                .catch(function(error) {
+                    deferred.reject(error);
+                });
 
+                return deferred.promise;
+            }
 
-var walletName;
-var walletAddress;
+            $q.all([getMempool(), getFeeRecommendation()])
+            .then(function(results) {
+               
+                console.log(results[0]);
+                console.log(results[1]);
+                scope.mempoolData = results[0]; // Data from getMempool
+                scope.feeRecommendation = results[1]; // Data from getFeeRecommendation
+
+                element.html(htmlTemplate);
+                // Compile the HTML to bind AngularJS expressions
+                $compile(element.contents())(scope);
+            })
+            .catch(function(error) {
+                console.error('Error fetching data:', error);
+            });
+        }
+    }
+}]);
 
 function livelyPropertyListener(name, val)
 {
@@ -181,8 +239,8 @@ function loadWallet(event, walletName, walletAddress) {
         (function(index) {
             var xhr3 = new XMLHttpRequest();
             var url = "https://api.blockcypher.com/v1/btc/main/addrs/" + WalletAddress[index] + "/balance";
-
-            xhr3.open("GET", url, true);
+            
+            xhr3.open("GET", url, false);
             xhr3.onreadystatechange = function() {
                 if (xhr3.readyState === 4) {
                     if (xhr3.status === 200) {
@@ -197,14 +255,14 @@ function loadWallet(event, walletName, walletAddress) {
 
 
             var xhr4 = new XMLHttpRequest();
-            var url = "https://api.blockcypher.com/v1/btc/main/addrs/" + WalletAddress[index] + "/full";
+            var url = "https://mempool.space/api/address/"+WalletAddress[index]+"/txs/chain";
 
-            xhr4.open("GET", url, true);
+            xhr4.open("GET", url, false);
             xhr4.onreadystatechange = function() {
                 if (xhr4.readyState === 4) {
                     if (xhr4.status === 200) {
                         var response = JSON.parse(xhr4.responseText);
-                        WalletCharts(response,WalletAddress[index]);
+                        WalletCharts(response,WalletAddress[index], walletName[index]);
                     } else {
                         console.log("HERE LOOKK HEREE for Full Failed: " + xhr4.responseText + " : " + response + " Error: Unable to fetch data.");
                     }
@@ -219,21 +277,151 @@ function loadWallet(event, walletName, walletAddress) {
     document.getElementById("walletName").value = "";
 }
 
-function WalletCharts(response, address)
+function WalletCharts(response, wAddress, wName)
 {
-    
     let transactions = [];
-
-    for (let i = 0; i < response.txs.length; i++) {
-        transactions.push(response.txs[i]);
+    let balance = parseFloat(document.getElementById("balance").innerHTML);
+    //Cleaned Data
+    for (let i = 0; i < response.length; i++) {
+        transactions.push(ProcessResponse(response[i], wAddress));
     }
-    console.log(address + "This is your address");
-    console.log(transactions[0]);
-    
-    
+
+    var dataPlots = [];
+    let startingDate = getTodaysDate();
+
+    dataPlots = PlotData(transactions, balance);
+    dataPlots.reverse();
+
+
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        // Assuming dataPlots is in the format [['Date', 'Balance'], [date1, balance1], [date2, balance2], ...]
+
+        var data = google.visualization.arrayToDataTable(dataPlots);
+
+        var options = {
+            title: 'Transaction History',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+    }
+ 
+}
+
+function ProcessResponse(response, address) {
+    // Cleaning Data from api call.
+
+    var dataMap = {
+        'Tfee' : response.fee,
+        'Tsigops' : response.sigops,
+        'Tsize' : response.size,
+        'Tdate' : convertTime(response.status.block_time),
+        'Tinputs' : [],
+        'addToTinputs': function(item){this.Tinputs.push(item);},
+        'TinputsAmounts' : [],
+        'addToTinputsAmounts': function(item){this.TinputsAmounts.push(item);},
+        'Toutputs' : [],
+        'addToToutputs': function(item){this.Toutputs.push(item);},
+        'ToutputsAmounts' : [],
+        'addToToutputsAmounts': function(item){this.ToutputsAmounts.push(item);}
+    };
+
+    for (var i = 0; i < response.vin.length; i++) {
+        if(response.vin[i].prevout.scriptpubkey_address == address){
+        dataMap.addToTinputs(response.vin[i].prevout.scriptpubkey_address);
+        dataMap.addToTinputsAmounts(response.vin[i].prevout.value);
+        }
+    }
+
+    for (var i = 0; i < response.vout.length; i++) {
+      if(response.vout[i].scriptpubkey_address == address){
+        dataMap.addToToutputs(response.vout[i].scriptpubkey_address);
+        dataMap.addToToutputsAmounts(response.vout[i].value);
+        }
+    }
+
+    // Return the mapped data point
+    return dataMap;
+}
+
+function getTodaysDate()
+{
+    let date = new Date();
+    let year = date.getFullYear();
+    let month = ('0' + (date.getMonth() + 1)).slice(-2); // Months are zero-based
+    let day = ('0' + date.getDate()).slice(-2);
+    let hours = ('0' + date.getHours()).slice(-2);
+    let minutes = ('0' + date.getMinutes()).slice(-2);
+    let seconds = ('0' + date.getSeconds()).slice(-2);
+
+    let formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+    return formattedDate;
+}
+
+function convertTime(time)
+{
 
     
-    
-    
+    let milliseconds = time * 1000;
+    let date = new Date(milliseconds);
+
+    let year = date.getFullYear();
+    let month = ('0' + (date.getMonth() + 1)).slice(-2); // Months are zero-based
+    let day = ('0' + date.getDate()).slice(-2);
+    let hours = ('0' + date.getHours()).slice(-2);
+    let minutes = ('0' + date.getMinutes()).slice(-2);
+    let seconds = ('0' + date.getSeconds()).slice(-2);
+
+    let formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+    return formattedDate;
+}
+
+function PlotData(dataMapArray, balance) {
+    // Define an array to store the plot points
+    var plotPoints = [];
+   
+    plotPoints.push([getTodaysDate(),balance]);
+    var runningBalance = balance;
+
+    // Iterate over each dataMap object
+    dataMapArray.forEach(function(datum) {
+        // Initialize variables to track input and output amounts
+        var i = 0;
+        var o = 0;
+
+        // Calculate input amount
+        datum.TinputsAmounts.forEach(function(y) {
+            i += y; // add all incoming 
+        });
+
+        // Calculate output amountS
+        datum.ToutputsAmounts.forEach(function(y) {
+            o += y; // add all outgoing 
+        });
+
+        // Calculate the total moved amount
+        var totalMoved = i - o;
+        runningBalance += totalMoved;
+        // Create a data point [date, amount]
+        // The amount is the current balance adjusted by the total moved (in or out) amount
+        var dataPoint = [datum.Tdate, runningBalance];
+
+        // Push the data point to the plotPoints array
+        plotPoints.push(dataPoint);
+
+        
+     
+    });
+    plotPoints.push(['Date','Balance']);
+    return plotPoints;
 
 };
+

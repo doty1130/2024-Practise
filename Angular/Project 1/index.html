@@ -13,11 +13,14 @@
         <div id = "Title">
             <h2>BCT Tracker</h2>
         </br>
-            <p id = "serverCheck"></p></div>
+            <p id = "serverCheck"></p>
+        </div>
         <div id="TrackingField" ng-app="myCoinApp">
-            <div id="walletObject"></div>
+            <mempool-Stats></mempool-Stats>
             <coin-Information></coin-Information>
             <market-Chart data="marketData"></market-Chart>
+            <div id="walletObject"></div> 
+            <div id ="chart_div"></div>
         </div>
       
       <!-- For website version Only-->
