@@ -36,10 +36,10 @@ function displayBitcoinInfo() {
         console.log(coinData);
 
         // Build HTML string
-        var html = "<h2>Bitcoin Information</h2>";
+        var html = "<div class='coin-Information-Style'><h2>Bitcoin Information</h2>";
         html += "<p>Price (USD): " + coinData.bitcoin.usd + "</p>";
         var lastUpdatedDate = new Date(coinData.bitcoin.last_updated_at * 1000); // Convert timestamp to date
-        html += "<p>Last Updated At: " + lastUpdatedDate.toLocaleString() + "</p>";
+        html += "<p>Last Updated At: " + lastUpdatedDate.toLocaleString() + "</p> </div>";
 
         return html;
     } else {
@@ -305,18 +305,20 @@ function WalletFormation(response, wAddress, wName, balance) {
         console.log("Addresses in use");
         console.log(addresses);
         Wallet[i][3] = false;
-        
+        DisplayBalance = (walletBalances[i] == "Undefined")? 0: walletBalances[i];
         if(addresses.includes(Wallet[i][1])){
             console.log("Address is used, skipping extra wallet");
             continue;
         }
         
         walletDivs.innerHTML += `
-        <div> 
-            <p> Current Balance in ${Wallet[i][0]} : <span id="Balance${i}">${walletBalances[i-1]}</span></p> 
+        <li> 
+            <p> Current Balance in ${Wallet[i][0]} : <span id="Balance${i}">${DisplayBalance}</span>
+            <span class = "toggle-container">
             <input type="checkbox" id="toggle${i}" onclick="WalletToggle(${i})">
-            <label for="walletToggle${i}">Toggle ${Wallet[i][0]}</label>
-        </div>`;
+            <label for="walletToggle${i}">Toggle</label>
+            </span></p> 
+        </li>`;
 
         console.log("adding address to count");
         addresses.push(Wallet[i][1])

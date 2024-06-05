@@ -9,31 +9,45 @@
         <link rel="stylesheet" href="./style/ProgramStyle.css">
         <title>Angular BCT Tracker</title>
     </head>
-    <body>
+    <body>   
         <div id = "Title">
             <h2>BCT Tracker</h2>
         </br>
             <p id = "serverCheck"></p>
         </div>
-        <div id="TrackingField" ng-app="myCoinApp">
-            <mempool-Stats></mempool-Stats>
-            <coin-Information></coin-Information>
-            <market-Chart data="marketData"></market-Chart>
-            <div id="walletObject"></div>
-            <div id ="chart-container"></div>
-        </div>
-      
-      <!-- For website version Only-->
-         <div id = "WalletInformation" style = "margin: 10px;">
+
+
+        <!-- For website version Only-->
+         <div id = "WalletInformation" style="width: 80vw; margin: auto; position: relative;">
+
             <button id="OpenForm" onclick="showInputForm()"><img src = "./assets/settings.png" width="15" height="15" ></button>
             <form id="WalletForm" style = "display:none;">
                 <label> Wallet Name </label>
                 <input id = "walletName" type="text"/>
                 <label> Wallet Address </label>
                 <input id = "walletAddress" type="text"/>
-                <button onclick="loadWallet(event, 'optionalWalletName', 'optionalWalletAddress')">Add Wallet</button>
+                <button onclick="loadWallet(event, 'optionalWalletName', 'optionalWalletAddress')">Add Wallet</button> 
+                <div id="WObjectCollection">
+                    <ul id = "walletObject">
+                    </ul>
+                </div>
+                
             </form>
+            <div class = "chart-Objects" id ="chart-container"></div>
         </div>
+      
+        
+        <div id="TrackingField" ng-app="myCoinApp">
+          
+            <div class="chart-Objects"> 
+               <coin-Information></coin-Information>
+                <market-Chart class = "chart-Objects" data="marketData"></market-Chart>
+                <mempool-Stats></mempool-Stats>
+            </div>  
+            
+        </div>
+      
+   
     </body>
 </html>
 

@@ -1,5 +1,92 @@
-body
-{
-    background-color: #333333;
-    color:bisque;
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: rgb(121, 203, 241);
+    margin: 0;
+    padding: 0;
+}
+
+/* Title styling */
+#Title h2 {
+    color: #333;
+    text-align: center;
+}
+
+/* Server check styling */
+#serverCheck {
+    color: green;
+    text-align: center;
+}
+
+/* Mempool stats styling */
+mempool-stats p {
+    background-color: #eaeaea;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px auto;
+}
+
+.coin-Information-Style {
+    max-width: 80vw; /* Set the maximum width for the chart */
+    margin: auto; /* Center the chart in the middle of the page */
+    overflow: auto; /* Add scrollbars if the content overflows */
+    background-color: #eaeaea;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px auto;
+}
+
+/* Wallet information styling */
+#WalletInformation {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+}
+
+
+
+#WalletForm input[type='text'] {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#WalletForm button {
+    padding: 10px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#WalletForm button:hover {
+    background-color: #4cae4c;
+}
+
+.chart-Objects {
+    max-width: 80vw; /* Set the maximum width for the chart */
+    margin: auto; /* Center the chart in the middle of the page */
+    overflow: auto; /* Add scrollbars if the content overflows */
+}
+
+#WObjectCollection {
+    
+    width: 60vw;  /* Set the desired width */
+    height: 20vh; /* Set the desired height */
+    overflow-y: scroll; /* Enable vertical scrolling */
+    border: 1px solid #ccc; /* Optional: Add a border for better visualization */
+    padding: 10px; /* Optional: Add some padding */
+}
+
+.toggle-container {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px; /* Optional: Adds space between the balance and the toggle */
+}
+
+.toggle-container input[type="checkbox"] {
+    margin-right: 5px; /* Optional: Adds space between the checkbox and the label */
 }
