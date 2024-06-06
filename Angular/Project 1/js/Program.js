@@ -9,8 +9,17 @@ var ChartWallet;
 var walletBalances = [];
 var Wallet = [];
 
+document.addEventListener("DOMContentLoaded", function(){
+    LoadServerCheck();
+});
 
-document.addEventListener("DOMContentLoaded", function() {    
+setInterval(function (){
+    console.log("Page Reloaded");
+    window.location.reload;
+
+}, 63000);
+
+function LoadServerCheck() {    
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "https://api.coingecko.com/api/v3/ping", true);
     xhr.onreadystatechange = function() {
@@ -21,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
     xhr.send();
-});
+};
 
 function displayBitcoinInfo() {
     var xhr = new XMLHttpRequest();
@@ -131,7 +140,8 @@ coinApp.directive("marketChart", ["$http", "$q", function($http, $q) {
                 var options = {
                     title: 'Cryptocurrency Prices',
                     curveType: 'function',
-                    legend: { position: 'bottom' }
+                    legend: { position: 'bottom' },
+                    //width:1600
                 };
 
                 var chartData = google.visualization.arrayToDataTable(pricesData);
@@ -343,7 +353,8 @@ function WalletChart()
 const options = {
     title: 'Wallet Data',
     legend: { position: 'bottom' },
-    colors: ['#FF5733', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#E91E63', '#00BCD4', '#FF9800', '#8BC34A', '#795548']
+    colors: ['#FF5733', '#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#E91E63', '#00BCD4', '#FF9800', '#8BC34A', '#795548'],
+    height: 250
     // Add more options as needed
 };
 var plotPoints = [];
@@ -401,36 +412,9 @@ plotPoints.unshift(headers);
 console.log(plotPoints);
 console.log("Check Cleaned Points");
 
-var chartData = google.visualization.arrayToDataTable(plotPoints);
-/* 
-
-
-// Convert plotPoints into Google Visualization format
-var chartData = plotPoints.map(entry => {
-    let rowData = [new Date(entry[0])];
-    for (let i = 1; i < entry.length; i++) {
-        if (typeof entry[i] === 'number') {
-            rowData.push(entry[i]); // Add numeric values only
-        } else {
-            rowData.push(null); // Add null for non-numeric values
-        }
-    }
-    return rowData;
-});
- */
+var chartData = google.visualization.arrayToDataTable(plotPoints); 
 try {
-    // Create DataTable from chartData
- /*    var data = new google.visualization.DataTable();
-    data.addColumn('date', 'Date');
-    for (let i = 1; i < headers.length; i++) {
-        data.addColumn('number', headers[i]); // Change type to 'number' for balance columns
-    }
-
-    // Add rows to DataTable
-    chartData.forEach(entry => {
-        data.addRow(entry); // Add each entry directly to the DataTable
-    }); */
-
+ 
     // Draw the chart
     if(MakeChart){   
         console.log("Show Chart");

@@ -10,16 +10,16 @@
         <title>Angular BCT Tracker</title>
     </head>
     <body>   
-        <div id = "Title">
-            <h2>BCT Tracker</h2>
-        </br>
-            <p id = "serverCheck"></p>
-        </div>
+       
 
 
         <!-- For website version Only-->
          <div id = "WalletInformation" style="width: 80vw; margin: auto; position: relative;">
-
+             <div id = "Title">
+             <h2>BCT Tracker</h2>
+                </br>
+             <p id = "serverCheck"></p>
+                </div>
             <button id="OpenForm" onclick="showInputForm()"><img src = "./assets/settings.png" width="15" height="15" ></button>
             <form id="WalletForm" style = "display:none;">
                 <label> Wallet Name </label>
@@ -40,13 +40,16 @@
         <div id="TrackingField" ng-app="myCoinApp">
           
             <div class="chart-Objects"> 
+
                <coin-Information></coin-Information>
-                <market-Chart class = "chart-Objects" data="marketData"></market-Chart>
-                <mempool-Stats></mempool-Stats>
+               <mempool-Stats></mempool-Stats>
+               <market-Chart data="marketData" style="margin: auto;"></market-Chart>
+                
+                
             </div>  
             
         </div>
-      
+    
    
     </body>
 </html>
